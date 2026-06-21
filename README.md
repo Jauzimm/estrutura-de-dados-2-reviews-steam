@@ -8,6 +8,15 @@ Somos o Grupo 11 da disciplina Estruturas de Dados 2 (EDA2), na Universidade de 
 
 O projeto consiste em um sistema capaz de ler grandes volumes de avaliações de jogos da Steam (a partir de uma base de dados em formato CSV) e gerar resumos automáticos compostos pelas frases originais mais representativas (sumarização extrativa).
 
+## Organização do Projeto
+
+O repositório está dividido nas seguintes pastas:
+
+- **Backend**: responsável pela implementação e processamento principal do projeto.
+- **Dataset**: contém os dados utilizados nos experimentos e avaliações.
+- **Materials**: reúne materiais de apoio, referências e outros arquivos relevantes para o desenvolvimento do trabalho.
+- **Slides**: contém as apresentações e slides produzidos sobre o projeto.
+
 ## Colaboradores
 
 <font size="3"><p style="text-align: left">**Tabela 1** - Colaboradores.</p></font>
