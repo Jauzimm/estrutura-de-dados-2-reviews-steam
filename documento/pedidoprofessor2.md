@@ -1,0 +1,3 @@
+- Utilizar a biblioteca spaCy para realizar o pré-processamento e a filtragem das frases das avaliações.
+- Para a sumarização extrativa de reviews de produtos, utilizar uma matriz de similaridade, pois ela facilita a representação das relações entre as frases e permite identificar quais sentenças são mais relevantes.
+- Inicialmente, aplicar um limiar de similaridade mais alto e reduzi-lo gradualmente, a fim de testar diferentes configurações e identificar o valor mais adequado para gerar resumos mais representativos e com menor redundância.
