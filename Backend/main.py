@@ -16,7 +16,7 @@ def tratar_dataset(dataset_path: Path, output_path: Path) -> pd.DataFrame:
     dados = dados[colunas_desejadas]
 
     # Remove reviews repetidas do mesmo jogo
-    dados = dados.drop_duplicates(subset=["appid", "review"])
+    dados = dados.drop_duplicates(subset=["review"])
 
     # Remove reviews sem texto
     dados = dados.dropna(subset=["review"])
