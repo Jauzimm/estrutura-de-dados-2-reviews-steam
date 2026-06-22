@@ -7,30 +7,35 @@ DATASET_PATH = BASE_DIR / "Dataset" / "dataset_steamreview_ptbr.csv"
 CLEAN_DATASET_PATH = BASE_DIR / "Backend" / "results" / "dataset_steamreview_limpo.csv"
 OUTPUT_PATH = BASE_DIR / "Frontend" / "reviews_resumidas.json"
 
-
 def tratar_dataset(dataset_path: Path, output_path: Path) -> pd.DataFrame:
 
-    colunas_desejadas = ["recommendationid","appid","game","review"]
+    colunas_desejadas = ["recommendationid", "appid", "game", "review"]
 
     dados = pd.read_csv(dataset_path)
 
     dados = dados[colunas_desejadas]
 
+    # Remove reviews repetidas do mesmo jogo
     dados = dados.drop_duplicates(subset=["appid", "review"])
 
+    # Remove reviews sem texto
     dados = dados.dropna(subset=["review"])
 
-    dados["review"] = (dados["review"].str.strip())
+    # Remove espaços desnecessários no começo e no final das reviews
+    dados["review"] = dados["review"].str.strip()
 
+    # Remove reviews com menos de 5 palavras
     dados = dados[dados["review"].str.split().str.len() >= 5]
 
-    quantidade_reviews = (dados.groupby("appid").size())
+    # Conta quantas reviews cada jogo possui
+    quantidade_reviews = dados.groupby("appid").size()
 
+    # Mantém apenas jogos com uma quantidade mínima de reviews
     jogos_validos = quantidade_reviews[quantidade_reviews >= 5].index
 
     dados = dados[dados["appid"].isin(jogos_validos)]
 
-    dados.to_csv(output_path,index=False)
+    dados.to_csv(output_path, index=False)
 
     return dados
 
