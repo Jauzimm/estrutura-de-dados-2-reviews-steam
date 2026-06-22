@@ -72,7 +72,7 @@ def possui_template_avaliacao(texto: str) -> bool:
         if re.search(padrao, texto):
             quantidade += 1
 
-    return quantidade >= 4
+    return quantidade >= 5
 
 
 def possui_muitos_simbolos(texto: str) -> bool:

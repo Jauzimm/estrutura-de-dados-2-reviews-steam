@@ -8,6 +8,8 @@ Somos o Grupo 11 da disciplina Estruturas de Dados 2 (EDA2), na Universidade de 
 
 O projeto consiste em um sistema capaz de ler grandes volumes de avaliações de jogos da Steam (a partir de uma base de dados em formato CSV) e gerar resumos automáticos compostos pelas frases originais mais representativas (sumarização extrativa).
 
+Link do dataset utilizado: [Steam Review](https://www.kaggle.com/datasets/kieranpoc/steam-reviews/data)
+
 ## Organização do Projeto
 
 O repositório está dividido nas seguintes pastas:
@@ -31,4 +33,4 @@ O repositório está dividido nas seguintes pastas:
 
 | Versão |               Descrição                |   Autor    |    Data    |    Revisor     | Data de revisão |
 | :----: | :------------------------------------: | :--------: | :--------: | :------------: | :-------------: |
-|  1.0   | Versão inicial da descrição do projeto | [João Vitor](https://github.com/Jauzimm) | 21/06/2026 | | |
+|  1.0   | Versão inicial da descrição do projeto | [João Vitor](https://github.com/Jauzimm) | 21/06/2026 |  |  |
