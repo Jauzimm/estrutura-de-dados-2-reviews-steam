@@ -41,6 +41,52 @@ def possui_ascii_art(texto: str) -> bool:
     )
 
 
+def possui_template_avaliacao(texto: str) -> bool:
+    texto = texto.lower()
+
+    padroes = [
+        r"gráficos",
+        r"graficos",
+        r"requisitos",
+        r"história",
+        r"historia",
+        r"jogabilidade",
+        r"complexidade",
+        r"dificuldade",
+        r"tempo de jogo",
+        r"áudio",
+        r"audio",
+        r"bugs",
+        r"diversão",
+        r"diversao",
+        r"vale a pena comprar",
+        r"compensa comprar",
+        r"fator replay",
+        r"publico",
+        r"comunidade",
+    ]
+
+    quantidade = 0
+
+    for padrao in padroes:
+        if re.search(padrao, texto):
+            quantidade += 1
+
+    return quantidade >= 4
+
+
+def possui_muitos_simbolos(texto: str) -> bool:
+    if len(texto) == 0:
+        return False
+
+    simbolos = re.findall(
+        r"[🔲☑️✅●○■□()\-_=]",
+        texto
+    )
+
+    return len(simbolos) / len(texto) > 0.05
+
+
 def tratar_dataset(dataset_path: Path, output_path: Path) -> pd.DataFrame:
 
     colunas_desejadas = [
@@ -54,29 +100,30 @@ def tratar_dataset(dataset_path: Path, output_path: Path) -> pd.DataFrame:
 
     dados = dados[colunas_desejadas]
 
-    # Remove reviews repetidas
-    dados = dados.drop_duplicates(subset=["review"])
-
-    # Remove reviews sem texto
     dados = dados.dropna(subset=["review"])
 
-    # Remove espaços desnecessários no começo e no final das reviews
     dados["review"] = dados["review"].str.strip()
 
-    # Remove reviews com menos de 5 palavras
+    dados = dados.drop_duplicates(subset=["review"])
+
     dados = dados[
         dados["review"].str.split().str.len() >= 5
     ]
 
-    # Remove reviews que são basicamente desenhos em ASCII
     dados = dados[
         ~dados["review"].apply(possui_ascii_art)
     ]
 
-    # Conta quantas reviews cada jogo possui
+    dados = dados[
+        ~dados["review"].apply(possui_template_avaliacao)
+    ]
+
+    dados = dados[
+        ~dados["review"].apply(possui_muitos_simbolos)
+    ]
+
     quantidade_reviews = dados.groupby("appid").size()
 
-    # Mantém apenas jogos com uma quantidade mínima de reviews
     jogos_validos = quantidade_reviews[
         quantidade_reviews >= 5
     ].index
