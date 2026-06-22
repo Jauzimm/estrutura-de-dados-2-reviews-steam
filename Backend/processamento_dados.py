@@ -4,7 +4,7 @@ import pandas as pd
 from tqdm import tqdm
 from excecoes import DataProcessingError
 
-# Ativa a barra de progresso nos applys
+# Ativa a barra de progresso para o apply
 tqdm.pandas(desc="Filtros de qualidade")
 
 # Expressões regulares pré‑compiladas
@@ -33,10 +33,9 @@ RE_SIMBOLOS = re.compile(r"[🔲☑️✅●○■□()\-_=]")
 
 
 # ------------------------------------------------------------
-# Funções auxiliares (privadas)
+# Funções auxiliares
 # ------------------------------------------------------------
 def _tem_arte_ascii(texto: str) -> bool:
-    """Retorna True se o texto parece conter arte ASCII."""
     if not texto:
         return False
     caracteres_arte = RE_ASCII_GLOBAL.findall(texto)
@@ -53,7 +52,6 @@ def _tem_arte_ascii(texto: str) -> bool:
 
 
 def _tem_template_avaliacao(texto: str) -> bool:
-    """Retorna True se o texto contém pelo menos 5 termos de templates de avaliação."""
     texto_min = texto.lower()
     quantidade = 0
     for padrao in PADROES_TEMPLATE:
@@ -63,7 +61,6 @@ def _tem_template_avaliacao(texto: str) -> bool:
 
 
 def _tem_muitos_simbolos(texto: str) -> bool:
-    """Retorna True se mais de 5% do texto são símbolos de template visual."""
     if not texto:
         return False
     simbolos = RE_SIMBOLOS.findall(texto)
@@ -71,47 +68,13 @@ def _tem_muitos_simbolos(texto: str) -> bool:
 
 
 def _contem_frase_copypasta(texto: str) -> bool:
-    """Retorna True se o texto contém a frase 'eu sou um pai de'."""
     return "eu sou um pai de" in texto.lower()
 
 
-def _remover_copypastas(dados: pd.DataFrame, limiar: float = 0.85) -> pd.DataFrame:
-    """Remove reviews quase duplicadas dentro de cada jogo (similaridade de Jaccard)."""
-    mascaras_remover = []
-    for appid, grupo in dados.groupby("appid"):
-        itens = []
-        for idx, texto in zip(grupo.index, grupo["review"]):
-            palavras = set(texto.lower().split())
-            itens.append((idx, texto, palavras))
-        # Ordena por tamanho do conjunto de palavras (mais rica primeiro)
-        itens.sort(key=lambda x: len(x[2]), reverse=True)
-        conjuntos_aceitos = []
-        for idx, texto, palavras in itens:
-            duplicado = False
-            for aceito in conjuntos_aceitos:
-                intersecao = palavras & aceito
-                uniao = palavras | aceito
-                jaccard = len(intersecao) / len(uniao) if uniao else 0
-                if jaccard >= limiar:
-                    duplicado = True
-                    break
-            if duplicado:
-                mascaras_remover.append(idx)
-            else:
-                conjuntos_aceitos.append(palavras)
-    return dados.drop(index=mascaras_remover)
-
-
 # ------------------------------------------------------------
-# Função principal (pública)
+# Função principal
 # ------------------------------------------------------------
-def limpar_e_filtrar_dataset(
-    caminho_dataset: Path,
-    caminho_saida: Path,
-    min_palavras: int = 5,
-    min_reviews_por_jogo: int = 10,
-    limiar_jaccard: float = 0.85
-) -> tuple[pd.DataFrame, dict]:
+def limpar_e_filtrar_dataset(caminho_dataset: Path, caminho_saida: Path, min_palavras: int = 5, min_reviews_por_jogo: int = 10) -> tuple[pd.DataFrame, dict]:
     """
     Limpa e filtra o dataset de reviews, removendo automaticamente
     reviews nulas ou strings vazias.
@@ -121,7 +84,6 @@ def limpar_e_filtrar_dataset(
         caminho_saida        : onde gravar o dataset limpo.
         min_palavras         : número mínimo de palavras por review.
         min_reviews_por_jogo : quantidade mínima de reviews para manter o jogo.
-        limiar_jaccard       : limiar de similaridade Jaccard para quase‑duplicatas.
 
     Retorna:
         (DataFrame limpo, dicionário {appid: nome_do_jogo})
@@ -137,13 +99,20 @@ def limpar_e_filtrar_dataset(
     colunas = ["recommendationid", "appid", "game", "review"]
     dados = dados[colunas]
 
-    # Remove nulas e strings vazias (etapa fixa)
+    # Filtra reviews que não são nulas e que, após strip, não ficam vazias
     mascara = dados["review"].notna() & (dados["review"].str.strip() != "")
     dados = dados[mascara]
 
+    # Remove qualquer NaN ainda presente na coluna "review" (redundância segura)
     dados = dados.dropna(subset=["review"])
+
+    # Limpa espaços em branco do início e do fim de todas as reviews
     dados["review"] = dados["review"].str.strip()
+
+    # Elimina reviews com exatamente o mesmo texto
     dados = dados.drop_duplicates(subset=["review"])
+
+    # Mantém apenas reviews que possuem pelo menos 'min_palavras' palavras
     dados = dados[dados["review"].str.split().str.len() >= min_palavras]
 
     # Filtro combinado
@@ -160,15 +129,12 @@ def limpar_e_filtrar_dataset(
 
     dados = dados[dados["review"].progress_apply(_aprovado)]
 
-    # Remoção de copypastas genéricas (Jaccard)
-    dados = _remover_copypastas(dados, limiar=limiar_jaccard)
-
     # Mantém apenas jogos com número suficiente de reviews
     contagem = dados.groupby("appid").size()
     jogos_validos = contagem[contagem >= min_reviews_por_jogo].index
     dados = dados[dados["appid"].isin(jogos_validos)]
 
-    # Cria diretório de saída se necessário
+    # Grava o resultado
     caminho_saida.parent.mkdir(parents=True, exist_ok=True)
     try:
         dados.to_csv(caminho_saida, index=False)
@@ -178,7 +144,5 @@ def limpar_e_filtrar_dataset(
     if dados.empty:
         raise DataProcessingError("Nenhuma review restante após a limpeza e filtragem")
 
-    # Mapeamento auxiliar appid -> nome do jogo
     appid_para_jogo = dict(zip(dados["appid"], dados["game"]))
-
     return dados, appid_para_jogo
