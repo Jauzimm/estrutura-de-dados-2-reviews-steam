@@ -55,8 +55,6 @@ O script irá:
 - Construir a matriz de similaridade e executar o PageRank
 - Selecionar reviews representativas distintas e salvar o resultado em JSON
 
-Observação: é necessário baixar o modelo de língua portuguesa do spaCy antes de executar:
-
 ```bash
 python -m spacy download pt_core_news_md
 ```
@@ -75,7 +73,7 @@ Atualmente, o código está modularizado da seguinte forma:
 - `processamento_nlp.py` → processamento com spaCy para gerar vetores de palavras de cada review.
 - `grafo_pagerank.py` → construção da matriz de similaridade e aplicação do PageRank sobre as reviews.
 - `selecao_reviews.py` → seleção das melhores reviews distintas e exportação para JSON.
-- `main.py` → orquestrador que chama as etapas de tratamento, vetorização, PageRank e seleção.
+- `main.py` → orquestrador do pipeline. Expõe parâmetros ajustáveis como política de seleção (quantas reviews pegar por jogo), limiares do PageRank e critérios de limpeza.
 - `results/` → diretório onde os arquivos de saída (dataset limpo, reviews resumidas) são armazenados.
 
 ### Dataset
