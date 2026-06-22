@@ -30,7 +30,7 @@ Link do dataset utilizado: [Steam Review](https://www.kaggle.com/datasets/kieran
 3. **Instale as dependências**
 
    ```bash
-   pip install -r requirements.txt
+   python -m pip install -r Backend/requirements.txt
    ```
 
 4. **Baixe o modelo de língua portuguesa do spaCy**
