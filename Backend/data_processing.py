@@ -1,6 +1,10 @@
 import re
 from pathlib import Path
 import pandas as pd
+from tqdm import tqdm
+
+# Ativa a barra de progresso nos applys com a descrição desejada
+tqdm.pandas(desc="Filtros de qualidade")
 
 # Arte ASCII global: símbolos que não são alfanuméricos, espaços ou pontuação comum
 RE_ASCII_GLOBAL = re.compile(r"[^a-zA-ZÀ-ÿ0-9\s.,!?;:'\"()\-]")
@@ -74,7 +78,11 @@ def _possui_muitos_simbolos(texto: str) -> bool:
 # ------------------------------------------------------------
 # Função principal
 # ------------------------------------------------------------
-def tratar_dataset(dataset_path: Path,output_path: Path,remover_vazias: bool = True) -> pd.DataFrame:
+def tratar_dataset(dataset_path: Path, output_path: Path, remover_vazias: bool = True) -> pd.DataFrame:
+    """
+    Lê, limpa e filtra o dataset, salvando o resultado limpo.
+    Exibe uma única barra de progresso para todos os filtros de qualidade.
+    """
 
     dados = pd.read_csv(dataset_path)
 
@@ -91,7 +99,7 @@ def tratar_dataset(dataset_path: Path,output_path: Path,remover_vazias: bool = T
         mascara_valida = dados["review"].notna() & (dados["review"].str.strip() != "")
         dados = dados[mascara_valida]
 
-    # Garantia extra (redundante se remover_vazias=True, mas seguro)
+    # Garantia extra
     dados = dados.dropna(subset=["review"])
     dados["review"] = dados["review"].str.strip()
 
@@ -99,10 +107,20 @@ def tratar_dataset(dataset_path: Path,output_path: Path,remover_vazias: bool = T
     dados = dados.drop_duplicates(subset=["review"])
     dados = dados[dados["review"].str.split().str.len() >= 5]
 
-    # Aplica os três filtros de qualidade
-    dados = dados[~dados["review"].apply(_possui_ascii_art)]
-    dados = dados[~dados["review"].apply(_possui_template_avaliacao)]
-    dados = dados[~dados["review"].apply(_possui_muitos_simbolos)]
+    # Função que aplica os três filtros de uma vez
+    def _filtro_combinado(texto: str) -> bool:
+        # Se qualquer filtro indicar que a review é inválida, retorna False
+        if _possui_ascii_art(texto):
+            return False
+        if _possui_template_avaliacao(texto):
+            return False
+        if _possui_muitos_simbolos(texto):
+            return False
+        # Passou por todos os filtros → review válida
+        return True
+
+    # Aplica o filtro combinado com uma única barra de progresso
+    dados = dados[dados["review"].progress_apply(_filtro_combinado)]
 
     # Mantém apenas jogos com no mínimo 5 reviews restantes
     quantidade_reviews = dados.groupby("appid").size()

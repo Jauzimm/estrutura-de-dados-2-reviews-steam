@@ -10,14 +10,78 @@ O projeto consiste em um sistema capaz de ler grandes volumes de avaliações de
 
 Link do dataset utilizado: [Steam Review](https://www.kaggle.com/datasets/kieranpoc/steam-reviews/data)
 
+## Como Rodar o Projeto
+
+1. **Clone o repositório**
+
+   ```bash
+   git clone https://github.com/seu-usuario/estrutura-de-dados-2-reviews-steam.git
+   cd estrutura-de-dados-2-reviews-steam
+   ```
+
+2. **Crie e ative um ambiente virtual (opcional, mas recomendado)**
+
+   ```bash
+   python -m venv venv
+   source venv/bin/activate   # Linux/Mac
+   venv\Scripts\activate      # Windows
+   ```
+
+3. **Instale as dependências**
+
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. **Baixe o modelo de língua portuguesa do spaCy**
+
+   ```bash
+   python -m spacy download pt_core_news_md
+   ```
+
+5. **Execute o pipeline principal**
+
+   ```bash
+   cd Backend
+   python main.py
+   ```
+
+O script irá:
+
+- Ler o dataset original (`Dataset/dataset_steamreview_ptbr.csv`)
+- Limpar e filtrar as reviews (remoção de arte ASCII, templates de avaliação, símbolos excessivos, etc.)
+- Salvar o dataset limpo em `Backend/results/dataset_steamreview_limpo.csv`
+- Processar as reviews com spaCy para obter vetores semânticos (atualmente exibe uma inspeção no terminal)
+
+As próximas etapas (construção do grafo e aplicação do PageRank) serão integradas ao `main.py` em breve.
+
 ## Organização do Projeto
 
 O repositório está dividido nas seguintes pastas:
 
-- **Backend**: responsável pela implementação e processamento principal do projeto.
-- **Dataset**: contém os dados utilizados nos experimentos e avaliações.
-- **Materials**: reúne materiais de apoio, referências e outros arquivos relevantes para o desenvolvimento do trabalho.
-- **Slides**: contém as apresentações e slides produzidos sobre o projeto.
+### Backend
+
+Responsável pela implementação e processamento principal do projeto.
+
+Atualmente, o código está modularizado da seguinte forma:
+
+- `data_processing.py` → funções de limpeza e filtragem das reviews (detecção de arte ASCII, templates de avaliação, símbolos excessivos).
+- `nlp_processing.py` → processamento com spaCy para gerar vetores de palavras de cada review.
+- `main.py` → orquestrador que chama as etapas de tratamento, vetorização e futuramente o PageRank.
+- `results/` → diretório onde os arquivos de saída (dataset limpo, reviews resumidas) são armazenados.
+
+### Dataset
+
+Contém os dados utilizados nos experimentos e avaliações.
+
+### Materials
+
+Reúne materiais de apoio, referências e outros arquivos relevantes para o desenvolvimento do trabalho.
+
+### Slides
+
+Contém as apresentações e slides produzidos sobre o projeto.
+
 
 ## Colaboradores
 
@@ -26,11 +90,3 @@ O repositório está dividido nas seguintes pastas:
 | <img src="https://github.com/Jauzimm.png" width="150px" > | <img src="https://github.com/Antedeguemon21.png" width="150px"> | <img src="https://github.com/KarolineLuz.png" width="150px"> | <img src="https://github.com/Marcelo-Adrian.png" width="150px"> | <img src="https://github.com/navicg.png" width="150px"> |
 | :-------------------------------------------------------: | :------------------------------------------------------------: | :----------------------------------------------------------: | :-------------------------------------------------------------: | :----------------------------------------------------: |
 |      [João Vitor Santos de Oliveira](https://github.com/Jauzimm)      |          [Leonardo Rodrigues](https://github.com/Antedeguemon21)    |   [Karoline Luz da Conceição](https://github.com/KarolineLuz) |       [Marcelo Adrian](https://github.com/Marcelo-Adrian)       |          [Ana Victória](https://github.com/navicg)             |
-
-## Histórico de Versões
-
-<font size="3"><p style="text-align: left">**Tabela 2** - Histórico de versões.</p></font>
-
-| Versão |               Descrição                |   Autor    |    Data    |    Revisor     | Data de revisão |
-| :----: | :------------------------------------: | :--------: | :--------: | :------------: | :-------------: |
-|  1.0   | Versão inicial da descrição do projeto | [João Vitor](https://github.com/Jauzimm) | 21/06/2026 |  |  |
