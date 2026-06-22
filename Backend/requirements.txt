@@ -3,3 +3,5 @@ numpy
 spacy
 tqdm
 click
+# Observação: é necessário baixar o modelo spaCy pt_core_news_md manualmente:
+# python -m spacy download pt_core_news_md

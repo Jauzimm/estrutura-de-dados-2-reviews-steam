@@ -51,9 +51,15 @@ O script irá:
 - Ler o dataset original (`Dataset/dataset_steamreview_ptbr.csv`)
 - Limpar e filtrar as reviews (remoção de arte ASCII, templates de avaliação, símbolos excessivos, etc.)
 - Salvar o dataset limpo em `Backend/results/dataset_steamreview_limpo.csv`
-- Processar as reviews com spaCy para obter vetores semânticos (atualmente exibe uma inspeção no terminal)
+- Processar as reviews com spaCy para obter vetores semânticos
+- Construir a matriz de similaridade e executar o PageRank
+- Selecionar reviews representativas distintas e salvar o resultado em JSON
 
-As próximas etapas (construção do grafo e aplicação do PageRank) serão integradas ao `main.py` em breve.
+Observação: é necessário baixar o modelo de língua portuguesa do spaCy antes de executar:
+
+```bash
+python -m spacy download pt_core_news_md
+```
 
 ## Organização do Projeto
 
@@ -65,9 +71,11 @@ Responsável pela implementação e processamento principal do projeto.
 
 Atualmente, o código está modularizado da seguinte forma:
 
-- `data_processing.py` → funções de limpeza e filtragem das reviews (detecção de arte ASCII, templates de avaliação, símbolos excessivos).
-- `nlp_processing.py` → processamento com spaCy para gerar vetores de palavras de cada review.
-- `main.py` → orquestrador que chama as etapas de tratamento, vetorização e futuramente o PageRank.
+- `processamento_dados.py` → funções de limpeza e filtragem das reviews (detecção de arte ASCII, templates de avaliação, símbolos excessivos).
+- `processamento_nlp.py` → processamento com spaCy para gerar vetores de palavras de cada review.
+- `grafo_pagerank.py` → construção da matriz de similaridade e aplicação do PageRank sobre as reviews.
+- `selecao_reviews.py` → seleção das melhores reviews distintas e exportação para JSON.
+- `main.py` → orquestrador que chama as etapas de tratamento, vetorização, PageRank e seleção.
 - `results/` → diretório onde os arquivos de saída (dataset limpo, reviews resumidas) são armazenados.
 
 ### Dataset
