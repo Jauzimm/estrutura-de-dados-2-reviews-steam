@@ -9,21 +9,28 @@ OUTPUT_PATH = BASE_DIR / "Frontend" / "reviews_resumidas.json"
 
 
 def tratar_dataset(dataset_path: Path, output_path: Path) -> pd.DataFrame:
-    colunas_desejadas = [
-        "recommendationid",
-        "appid",
-        "game",
-        "review"
-    ]
+
+    colunas_desejadas = ["recommendationid","appid","game","review"]
 
     dados = pd.read_csv(dataset_path)
 
     dados = dados[colunas_desejadas]
 
-    dados.to_csv(
-        output_path,
-        index=False
-    )
+    dados = dados.drop_duplicates(subset=["appid", "review"])
+
+    dados = dados.dropna(subset=["review"])
+
+    dados["review"] = (dados["review"].str.strip())
+
+    dados = dados[dados["review"].str.split().str.len() >= 5]
+
+    quantidade_reviews = (dados.groupby("appid").size())
+
+    jogos_validos = quantidade_reviews[quantidade_reviews >= 5].index
+
+    dados = dados[dados["appid"].isin(jogos_validos)]
+
+    dados.to_csv(output_path,index=False)
 
     return dados
 
