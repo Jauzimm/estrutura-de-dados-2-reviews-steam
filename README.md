@@ -65,7 +65,7 @@ O frontend oferece uma interface simplificada para buscar os jogos e ler as revi
 1. **Instale as dependências do Flask**
 
    ```bash
-   cd ../flask_app
+   cd ../Frontend
    python -m pip install -r requirements.txt
    ```
 
@@ -99,11 +99,11 @@ Responsável pela implementação e processamento principal do projeto.
 
 Interface com autocomplete e visualização de resumos.
 
-- `flask_app/app.py`: Servidor Flask que serve a interface e os endpoints de API.
-- `flask_app/templates/index.html`: Template HTML com o buscador e visualizador de reviews.
-- `flask_app/static/style.css`: Folha de estilos contendo o tema escuro.
-- `flask_app/static/script.js`: Comportamento dinâmico do autocomplete, suporte a navegação por teclado e busca assíncrona.
-- `flask_app/requirements.txt`: Dependências do frontend (Flask).
+- `Frontend/app.py`: Servidor Flask que serve a interface e os endpoints de API.
+- `Frontend/templates/index.html`: Template HTML com o buscador e visualizador de reviews.
+- `Frontend/static/style.css`: Folha de estilos contendo o tema escuro.
+- `Frontend/static/script.js`: Comportamento dinâmico do autocomplete, suporte a navegação por teclado e busca assíncrona.
+- `Frontend/requirements.txt`: Dependências do frontend (Flask).
 
 ---
 

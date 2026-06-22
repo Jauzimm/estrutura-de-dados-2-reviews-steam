@@ -11,7 +11,12 @@ venv/
 .venv/
 env/
 
+
+
 # OS/editor files
 .DS_Store
 .vscode/
 .idea/
+
+# Generated results
+Backend/results/reviews_resumidas.json
