@@ -11,16 +11,34 @@ OUTPUT_PATH = BASE_DIR / "Frontend" / "reviews_resumidas.json"
 
 
 def possui_ascii_art(texto: str) -> bool:
-    caracteres_especiais = re.findall(
-        r"[^a-zA-ZÀ-ÿ0-9\s]",
+    if len(texto) == 0:
+        return False
+
+    caracteres_arte = re.findall(
+        r"[^a-zA-ZÀ-ÿ0-9\s.,!?;:'\"()\-]",
         texto
     )
 
-    proporcao_simbolos = len(caracteres_especiais) / len(texto)
+    proporcao_arte = len(caracteres_arte) / len(texto)
 
-    quantidade_palavras = len(texto.split())
+    linhas = texto.split("\n")
 
-    return proporcao_simbolos > 0.35 and quantidade_palavras < 20
+    linhas_com_muitos_simbolos = 0
+
+    for linha in linhas:
+        if len(linha) > 10:
+            simbolos = re.findall(
+                r"[^a-zA-ZÀ-ÿ0-9\s]",
+                linha
+            )
+
+            if len(simbolos) / len(linha) > 0.5:
+                linhas_com_muitos_simbolos += 1
+
+    return (
+        proporcao_arte > 0.25
+        or linhas_com_muitos_simbolos >= 3
+    )
 
 
 def tratar_dataset(dataset_path: Path, output_path: Path) -> pd.DataFrame:
