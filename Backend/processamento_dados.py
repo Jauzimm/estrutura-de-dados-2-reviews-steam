@@ -74,7 +74,13 @@ def _contem_frase_copypasta(texto: str) -> bool:
 # ------------------------------------------------------------
 # Função principal
 # ------------------------------------------------------------
-def limpar_e_filtrar_dataset(caminho_dataset: Path, caminho_saida: Path, min_palavras: int = 5, min_reviews_por_jogo: int = 10) -> tuple[pd.DataFrame, dict]:
+def limpar_e_filtrar_dataset(
+    caminho_dataset: Path,
+    caminho_saida: Path,
+    min_palavras: int = 5,
+    max_palavras: int | None = None,
+    min_reviews_por_jogo: int = 10
+) -> tuple[pd.DataFrame, dict]:
     """
     Limpa e filtra o dataset de reviews, removendo automaticamente
     reviews nulas ou strings vazias.
@@ -83,6 +89,7 @@ def limpar_e_filtrar_dataset(caminho_dataset: Path, caminho_saida: Path, min_pal
         caminho_dataset      : caminho do CSV bruto.
         caminho_saida        : onde gravar o dataset limpo.
         min_palavras         : número mínimo de palavras por review.
+        max_palavras         : número máximo de palavras por review (None = sem limite).
         min_reviews_por_jogo : quantidade mínima de reviews para manter o jogo.
 
     Retorna:
@@ -128,6 +135,10 @@ def limpar_e_filtrar_dataset(caminho_dataset: Path, caminho_saida: Path, min_pal
         return True
 
     dados = dados[dados["review"].progress_apply(_aprovado)]
+
+    # Remove reviews que ultrapassam o limite máximo de palavras (se definido)
+    if max_palavras is not None:
+        dados = dados[dados["review"].str.split().str.len() <= max_palavras]
 
     # Mantém apenas jogos com número suficiente de reviews
     contagem = dados.groupby("appid").size()
