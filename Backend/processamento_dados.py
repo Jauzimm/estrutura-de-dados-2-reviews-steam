@@ -111,7 +111,7 @@ def limpar_e_filtrar_dataset(
     min_palavras: int = 5,
     min_reviews_por_jogo: int = 10,
     limiar_jaccard: float = 0.85
-) -> pd.DataFrame:
+) -> tuple[pd.DataFrame, dict]:
     """
     Limpa e filtra o dataset de reviews, removendo automaticamente
     reviews nulas ou strings vazias.
@@ -122,6 +122,9 @@ def limpar_e_filtrar_dataset(
         min_palavras         : número mínimo de palavras por review.
         min_reviews_por_jogo : quantidade mínima de reviews para manter o jogo.
         limiar_jaccard       : limiar de similaridade Jaccard para quase‑duplicatas.
+
+    Retorna:
+        (DataFrame limpo, dicionário {appid: nome_do_jogo})
     """
     if not Path(caminho_dataset).exists():
         raise DataProcessingError(f"Arquivo de dataset não encontrado: {caminho_dataset}")
@@ -175,4 +178,7 @@ def limpar_e_filtrar_dataset(
     if dados.empty:
         raise DataProcessingError("Nenhuma review restante após a limpeza e filtragem")
 
-    return dados
+    # Mapeamento auxiliar appid -> nome do jogo
+    appid_para_jogo = dict(zip(dados["appid"], dados["game"]))
+
+    return dados, appid_para_jogo

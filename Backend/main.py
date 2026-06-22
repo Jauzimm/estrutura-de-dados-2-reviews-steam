@@ -19,9 +19,9 @@ AMORTECIMENTO_PAGERANK = 0.85
 LIMIAR_SIMILARIDADE_SELECAO = 0.8
 
 # Parâmetros de limpeza
-MIN_PALAVRAS_POR_REVIEW = 5          # mínimo de palavras por review
-MIN_REVIEWS_POR_JOGO = 10            # mínimo de reviews para manter o jogo
-LIMIAR_JACCARD_COPYPASTA = 0.85      # limiar para remoção de quase‑duplicatas
+MIN_PALAVRAS_POR_REVIEW = 5
+MIN_REVIEWS_POR_JOGO = 10
+LIMIAR_JACCARD_COPYPASTA = 0.85
 
 
 def main() -> None:
@@ -32,17 +32,14 @@ def main() -> None:
     logger = logging.getLogger(__name__)
 
     try:
-        # 1° Limpeza e filtragem
-        dados_tratados = limpar_e_filtrar_dataset(
+        # 1° Limpeza e filtragem (retorna dados e mapeamento appid->jogo)
+        dados_tratados, appid_para_jogo = limpar_e_filtrar_dataset(
             DATASET_PATH,
             CLEAN_DATASET_PATH,
             min_palavras=MIN_PALAVRAS_POR_REVIEW,
             min_reviews_por_jogo=MIN_REVIEWS_POR_JOGO,
             limiar_jaccard=LIMIAR_JACCARD_COPYPASTA
         )
-
-        # Mapeamento appid -> nome do jogo
-        appid_para_jogo = dict(zip(dados_tratados["appid"], dados_tratados["game"]))
 
         # 2° Vetorização com spaCy
         reviews_por_jogo = vetorizar_reviews_spacy(dados_tratados)
@@ -63,7 +60,6 @@ def main() -> None:
 
         # 5° Exportação para JSON
         salvar_reviews_json(melhores_reviews, OUTPUT_PATH, appid_para_jogo)
-        logger.info("Pipeline concluído com sucesso. Resultado em: %s", OUTPUT_PATH)
 
     except PipelineError as e:
         logger.error("Erro no pipeline: %s", e)
