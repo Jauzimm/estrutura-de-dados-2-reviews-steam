@@ -3,15 +3,14 @@ from pathlib import Path
 import pandas as pd
 from tqdm import tqdm
 
-# Ativa a barra de progresso nos applys com a descrição desejada
+# Ativa a barra de progresso nos applys
 tqdm.pandas(desc="Filtros de qualidade")
 
-# Arte ASCII global: símbolos que não são alfanuméricos, espaços ou pontuação comum
+# Arte ASCII global
 RE_ASCII_GLOBAL = re.compile(r"[^a-zA-ZÀ-ÿ0-9\s.,!?;:'\"()\-]")
-# Arte ASCII por linha: ignora apenas alfanuméricos e espaços
 RE_ASCII_LINHA = re.compile(r"[^a-zA-ZÀ-ÿ0-9\s]")
 
-# Template de avaliação: cada padrão com word boundary e acentos opcionais
+# Template de avaliação
 PADROES_TEMPLATE = [
     re.compile(r"\bgr[aá]ficos\b"),
     re.compile(r"\brequisitos\b"),
@@ -30,35 +29,29 @@ PADROES_TEMPLATE = [
     re.compile(r"\bcomunidade\b"),
 ]
 
-# Símbolos específicos de templates visuais
+# Símbolos de template visual
 RE_SIMBOLOS = re.compile(r"[🔲☑️✅●○■□()\-_=]")
 
-
 # ------------------------------------------------------------
-# Funções auxiliares 
+# Funções auxiliares
 # ------------------------------------------------------------
 def _possui_ascii_art(texto: str) -> bool:
-    """Retorna True se o texto parece conter arte ASCII."""
     if not texto:
         return False
-
     caracteres_arte = RE_ASCII_GLOBAL.findall(texto)
     proporcao_arte = len(caracteres_arte) / len(texto)
 
     linhas = texto.split("\n")
     linhas_com_muitos_simbolos = 0
-
     for linha in linhas:
         if len(linha) > 10:
             simbolos = RE_ASCII_LINHA.findall(linha)
             if len(simbolos) / len(linha) > 0.5:
                 linhas_com_muitos_simbolos += 1
-
     return proporcao_arte > 0.20 or linhas_com_muitos_simbolos >= 3
 
 
 def _possui_template_avaliacao(texto: str) -> bool:
-    """Retorna True se o texto contiver pelo menos 5 termos de templates de avaliação."""
     texto_lower = texto.lower()
     quantidade = 0
     for padrao in PADROES_TEMPLATE:
@@ -68,67 +61,82 @@ def _possui_template_avaliacao(texto: str) -> bool:
 
 
 def _possui_muitos_simbolos(texto: str) -> bool:
-    """Retorna True se mais de 5% do texto são símbolos específicos de template visual."""
     if not texto:
         return False
     simbolos = RE_SIMBOLOS.findall(texto)
     return len(simbolos) / len(texto) > 0.05
 
 
+def _contem_frase_copypasta(texto: str) -> bool:
+    """Retorna True se o texto contém a frase típica de copypasta 'eu sou um pai de'."""
+    return "eu sou um pai de" in texto.lower()
+
+
+def _remover_copypastas(dados: pd.DataFrame, limiar: float = 0.85) -> pd.DataFrame:
+    """Remove reviews quase duplicadas dentro de cada jogo (Jaccard)."""
+    mascaras_remover = []
+    for appid, grupo in dados.groupby("appid"):
+        itens = []
+        for idx, texto in zip(grupo.index, grupo["review"]):
+            palavras = set(texto.lower().split())
+            itens.append((idx, texto, palavras))
+        itens.sort(key=lambda x: len(x[2]), reverse=True)
+        sets_aceitos = []
+        for idx, texto, palavras in itens:
+            duplicado = False
+            for aceito in sets_aceitos:
+                intersecao = palavras & aceito
+                uniao = palavras | aceito
+                jaccard = len(intersecao) / len(uniao) if uniao else 0
+                if jaccard >= limiar:
+                    duplicado = True
+                    break
+            if duplicado:
+                mascaras_remover.append(idx)
+            else:
+                sets_aceitos.append(palavras)
+    return dados.drop(index=mascaras_remover)
+
+
 # ------------------------------------------------------------
 # Função principal
 # ------------------------------------------------------------
 def tratar_dataset(dataset_path: Path, output_path: Path, remover_vazias: bool = True) -> pd.DataFrame:
-    """
-    Lê, limpa e filtra o dataset, salvando o resultado limpo.
-    Exibe uma única barra de progresso para todos os filtros de qualidade.
-    """
-
     dados = pd.read_csv(dataset_path)
-
-    colunas_desejadas = [
-        "recommendationid",
-        "appid",
-        "game",
-        "review"
-    ]
+    colunas_desejadas = ["recommendationid", "appid", "game", "review"]
     dados = dados[colunas_desejadas]
 
-    # Eliminação de reviews vazias
     if remover_vazias:
         mascara_valida = dados["review"].notna() & (dados["review"].str.strip() != "")
         dados = dados[mascara_valida]
 
-    # Garantia extra
     dados = dados.dropna(subset=["review"])
     dados["review"] = dados["review"].str.strip()
-
-    # Remove duplicatas e reviews muito curtas
     dados = dados.drop_duplicates(subset=["review"])
     dados = dados[dados["review"].str.split().str.len() >= 5]
 
-    # Função que aplica os três filtros de uma vez
+    # Filtro combinado (inclui agora a detecção da frase proibida)
     def _filtro_combinado(texto: str) -> bool:
-        # Se qualquer filtro indicar que a review é inválida, retorna False
         if _possui_ascii_art(texto):
             return False
         if _possui_template_avaliacao(texto):
             return False
         if _possui_muitos_simbolos(texto):
             return False
-        # Passou por todos os filtros → review válida
+        if _contem_frase_copypasta(texto):   # <-- novo filtro
+            return False
         return True
 
-    # Aplica o filtro combinado com uma única barra de progresso
     dados = dados[dados["review"].progress_apply(_filtro_combinado)]
 
-    # Mantém apenas jogos com no mínimo 5 reviews restantes
+    # Remoção de copypastas genéricas (Jaccard)
+    dados = _remover_copypastas(dados, limiar=0.85)
+
+    # Mantém jogos com pelo menos 5 reviews
     quantidade_reviews = dados.groupby("appid").size()
-    jogos_validos = quantidade_reviews[quantidade_reviews >= 5].index
+    jogos_validos = quantidade_reviews[quantidade_reviews >= 10].index
     dados = dados[dados["appid"].isin(jogos_validos)]
 
-    # Salva o dataset limpo
     output_path.parent.mkdir(parents=True, exist_ok=True)
     dados.to_csv(output_path, index=False)
-
     return dados
