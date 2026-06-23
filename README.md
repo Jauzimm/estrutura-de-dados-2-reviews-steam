@@ -93,6 +93,9 @@ Responsável pela implementação e processamento principal do projeto.
 - `grafo_pagerank.py`: Construção do grafo de similaridade e aplicação do PageRank.
 - `selecao_reviews.py`: Seleção das melhores reviews distintas.
 - `main.py`: Orquestrador principal do pipeline.
+- `excecoes.py`: Exceções customizadas para cada etapa do pipeline (limpeza, NLP, grafo, seleção e heap).
+- `max_heap.py`: Implementação da estrutura de dados MaxHeap usada para ranquear as reviews pelo score do PageRank.
+- `requirements.txt`: Dependências do backend (pandas, numpy, spaCy, tqdm, click).
 - `results/`: Diretório contendo as saídas processadas, inclusive `reviews_resumidas.json`.
 
 ### Frontend
