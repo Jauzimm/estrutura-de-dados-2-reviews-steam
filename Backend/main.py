@@ -15,7 +15,7 @@ OUTPUT_PATH = BASE_DIR / "Backend" / "results" / "reviews_resumidas.json"
 
 # Parâmetros de limpeza
 MIN_PALAVRAS_POR_REVIEW = 5         # mínimo de palavras por review
-MAX_PALAVRAS_POR_REVIEW = None      # máximo de palavras por review (None = sem limite)
+MAX_PALAVRAS_POR_REVIEW = 200      # máximo de palavras por review (None = sem limite)
 MIN_REVIEWS_POR_JOGO = 10           # mínimo de reviews para manter o jogo
 
 # Parâmetros ajustáveis do pipeline
