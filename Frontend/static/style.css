@@ -147,10 +147,10 @@ body {
 }
 
 .logo-icon {
-  width: 36px;
-  height: 36px;
-  color: var(--accent);
-  filter: drop-shadow(0 0 8px var(--accent-glow));
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 10px rgba(102, 192, 244, 0.5));
 }
 
 .logo h1 {
