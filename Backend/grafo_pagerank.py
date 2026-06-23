@@ -1,6 +1,7 @@
 import numpy as np
 from tqdm import tqdm
 from excecoes import GraphError
+from max_heap import MaxHeap
 
 
 def _matriz_similaridade_cosseno(vetores: np.ndarray) -> np.ndarray:
@@ -99,14 +100,25 @@ def calcular_pagerank_por_jogo(
             # Executa o algoritmo PageRank
             scores = _pagerank(M, amortecimento=amortecimento, tolerancia=tolerancia, max_iter=max_iter)
 
-            # Ordena as reviews pelos scores (maior primeiro)
-            ordem = np.argsort(-scores)
+            # Usa MaxHeap para ordenar as reviews por score
+            heap = MaxHeap()
+            itens = [
+                (float(scores[i]), {
+                    "index": lista_reviews[i]["index"],
+                    "review": lista_reviews[i]["review"],
+                })
+                for i in range(N)
+            ]
+            heap.construir_heap(itens)
+
+            # Extrai os maiores sequencialmente garantindo ordem decrescente
             ranqueadas = []
-            for idx in ordem:
+            while len(heap) > 0:
+                score, dados = heap.extrair_maximo()
                 ranqueadas.append({
-                    "index": lista_reviews[idx]["index"],
-                    "review": lista_reviews[idx]["review"],
-                    "score": float(scores[idx]),
+                    "index": dados["index"],
+                    "review": dados["review"],
+                    "score": score,
                 })
             resultado[appid] = ranqueadas
 

@@ -24,3 +24,8 @@ class GraphError(PipelineError):
 class SelectionError(PipelineError):
     """Erro na seleção de reviews ou na exportação dos resultados."""
     pass
+
+
+class HeapError(PipelineError):
+    """Erro relacionado à MaxHeap."""
+    pass
