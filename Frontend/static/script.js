@@ -216,7 +216,7 @@ function renderResults(data) {
 
         const rankLabel = document.createElement("span");
         rankLabel.className = "rank-label";
-        rankLabel.textContent = `Review #${index + 1}`;
+        rankLabel.textContent = "Review";
 
         rankDiv.appendChild(rankNum);
         rankDiv.appendChild(rankLabel);
