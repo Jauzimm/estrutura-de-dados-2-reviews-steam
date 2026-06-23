@@ -1,0 +1,604 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap");
+
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  /* Steam core palette */
+  --bg-primary: #1b2838;
+  --bg-secondary: #171a21;
+  --bg-card: rgba(42, 71, 94, 0.35);
+  --bg-hover: rgba(62, 103, 135, 0.45);
+  --bg-input: rgba(42, 71, 94, 0.5);
+  --border-color: rgba(255, 255, 255, 0.08);
+  --border-focus: #66c0f4;
+  --text-primary: #c7d5e0;
+  --text-secondary: #8f98a0;
+  --text-muted: #556772;
+  --accent: #66c0f4;
+  --accent-glow: rgba(102, 192, 244, 0.25);
+  --accent-soft: rgba(102, 192, 244, 0.1);
+  --score-color: #66c0f4;
+  --steam-gradient: linear-gradient(135deg, #1b2838 0%, #2a475e 100%);
+  --glass-bg: rgba(42, 71, 94, 0.35);
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  --glass-blur: blur(20px);
+  --radius: 12px;
+  --radius-lg: 16px;
+  --transition: 0.2s ease;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family:
+    "Poppins",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* ====== WAVE BACKGROUND ====== */
+.wave {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.wave span {
+  position: absolute;
+  width: 325vh;
+  height: 325vh;
+  bottom: 0;
+  left: 50%;
+  transform: translate(-50%, 75%);
+}
+
+.wave span:nth-child(1) {
+  border-radius: 45%;
+  background: rgba(42, 71, 94, 0.45);
+  animation: waveRotate 72s linear infinite;
+}
+
+.wave span:nth-child(2) {
+  border-radius: 40%;
+  background: rgba(23, 26, 33, 0.35);
+  animation: waveRotate 96s linear infinite;
+}
+
+.wave span:nth-child(3) {
+  border-radius: 42.5%;
+  background: rgba(27, 40, 56, 0.3);
+  animation: waveRotate 120s linear infinite;
+}
+
+@keyframes waveRotate {
+  0% {
+    transform: translate(-50%, 75%) rotate(0deg);
+  }
+
+  100% {
+    transform: translate(-50%, 75%) rotate(360deg);
+  }
+}
+
+/* ====== LAYOUT ====== */
+#app-container {
+  flex: 1;
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 0 24px;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  z-index: 1;
+}
+
+/* Estado centralizado */
+#app-container.centered {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-top: 0;
+}
+
+/* Estado com resultados */
+#app-container.top-aligned {
+  justify-content: flex-start;
+  padding-top: 48px;
+}
+
+/* ====== HEADER ====== */
+#header {
+  text-align: center;
+  margin-bottom: 40px;
+  animation: fadeInDown 0.6s ease;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin-bottom: 10px;
+}
+
+.logo-icon {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 10px rgba(102, 192, 244, 0.5));
+}
+
+.logo h1 {
+  font-size: 2rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #c7d5e0 0%, #66c0f4 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.5px;
+}
+
+.subtitle {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  font-weight: 400;
+}
+
+.subtitle strong {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* ====== BARRA DE PESQUISA (Glassmorphism) ====== */
+#search-wrapper {
+  width: 100%;
+  position: relative;
+  z-index: 100;
+  margin-bottom: 32px;
+}
+
+.search-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon {
+  position: absolute;
+  left: 18px;
+  width: 20px;
+  height: 20px;
+  color: var(--text-muted);
+  pointer-events: none;
+  transition: color var(--transition);
+}
+
+#search-input {
+  width: 100%;
+  padding: 16px 48px 16px 52px;
+  background: rgba(42, 71, 94, 0.4);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1.5px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-lg);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 1.05rem;
+  font-weight: 500;
+  outline: none;
+  transition: all var(--transition);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+#search-input::placeholder {
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+#search-input:focus {
+  border-color: var(--border-focus);
+  box-shadow:
+    0 0 0 3px var(--accent-glow),
+    0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+#search-input:focus ~ .search-icon,
+.search-box:hover .search-icon {
+  color: var(--accent);
+}
+
+.clear-btn {
+  position: absolute;
+  right: 14px;
+  width: 28px;
+  height: 28px;
+  background: var(--bg-hover);
+  border: none;
+  border-radius: 50%;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition);
+}
+
+.clear-btn:hover {
+  background: var(--accent);
+  color: white;
+}
+
+/* ====== SUGESTÕES (Glassmorphism) ====== */
+.suggestions {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  background: rgba(23, 26, 33, 0.85);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1.5px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius);
+  list-style: none;
+  max-height: 340px;
+  overflow-y: auto;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+  animation: slideDown 0.15s ease;
+}
+
+.suggestions li {
+  padding: 13px 20px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  transition: background var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.suggestions li:last-child {
+  border-bottom: none;
+}
+
+.suggestions li:hover,
+.suggestions li.active {
+  background: var(--bg-hover);
+}
+
+.suggestions li .match-highlight {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.suggestions li .appid-tag {
+  margin-left: auto;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 400;
+  font-family: "Poppins", monospace;
+}
+
+.suggestions::-webkit-scrollbar {
+  width: 6px;
+}
+
+.suggestions::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.suggestions::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+/* ====== RESULTADOS ====== */
+#results {
+  width: 100%;
+  animation: fadeInUp 0.4s ease;
+}
+
+#game-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+#game-title {
+  font-size: 1.7rem;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+  color: var(--text-primary);
+}
+
+.badge {
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 20px;
+  border: 1px solid rgba(102, 192, 244, 0.2);
+  font-family: "Poppins", monospace;
+}
+
+.reviews-meta {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin-bottom: 24px;
+}
+
+/* ====== REVIEW CARDS (Glassmorphism) ====== */
+.review-card {
+  background: rgba(42, 71, 94, 0.35);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.03);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  margin-bottom: 16px;
+  transition: all var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+
+.review-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(102, 192, 244, 0.3),
+    transparent
+  );
+}
+
+.review-card::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 100%;
+  background: linear-gradient(
+    180deg,
+    rgba(102, 192, 244, 0.3),
+    transparent,
+    rgba(255, 255, 255, 0.05)
+  );
+}
+
+.review-card:hover {
+  border-color: rgba(102, 192, 244, 0.3);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    0 0 20px rgba(102, 192, 244, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.05);
+  transform: translateY(-2px);
+}
+
+.review-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.review-rank {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.rank-number {
+  width: 30px;
+  height: 30px;
+  background: linear-gradient(135deg, #66c0f4, #4e8fb4);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: white;
+}
+
+.rank-label {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.review-score {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(102, 192, 244, 0.08);
+  padding: 5px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(102, 192, 244, 0.15);
+}
+
+.review-score .score-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.review-score .score-value {
+  font-size: 0.9rem;
+  color: var(--score-color);
+  font-weight: 700;
+  font-family: "Poppins", monospace;
+}
+
+.review-text {
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+  line-height: 1.75;
+  white-space: pre-line;
+  word-break: break-word;
+}
+
+/* Card expandido/colapsado */
+.review-text.collapsed {
+  max-height: 160px;
+  overflow: hidden;
+  position: relative;
+  -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+  mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+}
+
+.expand-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 12px;
+  padding: 6px 14px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  border: 1px solid rgba(102, 192, 244, 0.2);
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.expand-btn:hover {
+  background: rgba(102, 192, 244, 0.18);
+}
+
+/* ====== FOOTER ====== */
+#footer {
+  text-align: center;
+  padding: 24px;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  border-top: 1px solid var(--border-color);
+  margin-top: auto;
+  position: relative;
+  z-index: 1;
+}
+
+/* ====== ESTADOS ====== */
+.hidden {
+  display: none !important;
+}
+
+.no-results {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+/* ====== ANIMAÇÕES ====== */
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ====== RESPONSIVO ====== */
+@media (max-width: 600px) {
+  .logo h1 {
+    font-size: 1.5rem;
+  }
+
+  #search-input {
+    padding: 14px 44px 14px 46px;
+    font-size: 0.95rem;
+  }
+
+  #game-title {
+    font-size: 1.3rem;
+  }
+
+  .review-card {
+    padding: 18px;
+  }
+
+  .review-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .wave span {
+    width: 200vh;
+    height: 200vh;
+  }
+}

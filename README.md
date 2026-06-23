@@ -12,6 +12,8 @@ Link do dataset utilizado: [Steam Review](https://www.kaggle.com/datasets/kieran
 
 ## Como Rodar o Projeto
 
+Primeiro, realize a configuração base:
+
 1. **Clone o repositório**
 
    ```bash
@@ -27,66 +29,89 @@ Link do dataset utilizado: [Steam Review](https://www.kaggle.com/datasets/kieran
    venv\Scripts\activate      # Windows
    ```
 
-3. **Instale as dependências**
+---
+
+### Backend
+
+O backend realiza a leitura da base em CSV, pré-processa os textos, calcula vetores com spaCy e aplica o PageRank para gerar o JSON com os resumos das reviews.
+
+1. **Instale as dependências**
 
    ```bash
    python -m pip install -r Backend/requirements.txt
    ```
 
-4. **Baixe o modelo de língua portuguesa do spaCy**
+2. **Baixe o modelo de língua portuguesa do spaCy**
 
    ```bash
    python -m spacy download pt_core_news_md
    ```
 
-5. **Execute o pipeline principal**
+3. **Execute o pipeline principal**
 
    ```bash
    cd Backend
    python main.py
    ```
 
-O script irá:
+   O script irá ler, processar os dados e salvar as melhores reviews no formato JSON em `Backend/results/reviews_resumidas.json`.
 
-- Ler o dataset original (`Dataset/dataset_steamreview_ptbr.csv`)
-- Limpar e filtrar as reviews (remoção de arte ASCII, templates de avaliação, símbolos excessivos, etc.)
-- Salvar o dataset limpo em `Backend/results/dataset_steamreview_limpo.csv`
-- Processar as reviews com spaCy para obter vetores semânticos
-- Construir a matriz de similaridade e executar o PageRank
-- Selecionar reviews representativas distintas e salvar o resultado em JSON
+---
 
-```bash
-python -m spacy download pt_core_news_md
-```
+### Frontend 
+
+O frontend oferece uma interface simplificada para buscar os jogos e ler as reviews selecionadas.
+
+1. **Instale as dependências do Flask**
+
+   ```bash
+   cd ../Frontend
+   python -m pip install -r requirements.txt
+   ```
+
+2. **Inicie o servidor de desenvolvimento**
+
+   ```bash
+   python app.py
+   ```
+
+3. **Acesse no navegador**
+
+   Abra o endereço [http://127.0.0.1:5000](http://127.0.0.1:5000). Observe que o endereço e a porta podem variar. Verifique o endereço no seu terminal.
+
 
 ## Organização do Projeto
 
-O repositório está dividido nas seguintes pastas:
+O repositório está organizado de forma a separar a lógica de análise de dados da interface visual:
 
 ### Backend
 
 Responsável pela implementação e processamento principal do projeto.
 
-Atualmente, o código está modularizado da seguinte forma:
+- `processamento_dados.py`: Funções de limpeza e filtragem das reviews (remoção de ruídos).
+- `processamento_nlp.py`: Processamento com spaCy para gerar vetores de palavras de cada review.
+- `grafo_pagerank.py`: Construção do grafo de similaridade e aplicação do PageRank.
+- `selecao_reviews.py`: Seleção das melhores reviews distintas.
+- `main.py`: Orquestrador principal do pipeline.
+- `results/`: Diretório contendo as saídas processadas, inclusive `reviews_resumidas.json`.
 
-- `processamento_dados.py` → funções de limpeza e filtragem das reviews (detecção de arte ASCII, templates de avaliação, símbolos excessivos).
-- `processamento_nlp.py` → processamento com spaCy para gerar vetores de palavras de cada review.
-- `grafo_pagerank.py` → construção da matriz de similaridade e aplicação do PageRank sobre as reviews.
-- `selecao_reviews.py` → seleção das melhores reviews distintas e exportação para JSON.
-- `main.py` → orquestrador do pipeline. Expõe parâmetros ajustáveis como política de seleção (quantas reviews pegar por jogo), limiares do PageRank e critérios de limpeza.
-- `results/` → diretório onde os arquivos de saída (dataset limpo, reviews resumidas) são armazenados.
+### Frontend
 
-### Dataset
+Interface com autocomplete e visualização de resumos.
 
-Contém os dados utilizados nos experimentos e avaliações.
+- `Frontend/app.py`: Servidor Flask que serve a interface e os endpoints de API.
+- `Frontend/templates/index.html`: Template HTML com o buscador e visualizador de reviews.
+- `Frontend/static/style.css`: Folha de estilos contendo o tema escuro.
+- `Frontend/static/script.js`: Comportamento dinâmico do autocomplete, suporte a navegação por teclado e busca assíncrona.
+- `Frontend/requirements.txt`: Dependências do frontend (Flask).
 
-### Materials
+---
 
-Reúne materiais de apoio, referências e outros arquivos relevantes para o desenvolvimento do trabalho.
+### Outras Pastas
 
-### Slides
-
-Contém as apresentações e slides produzidos sobre o projeto.
+- **Dataset**: Contém os dados originais utilizados.
+- **Materials**: Reúne materiais de apoio, referências e outros arquivos auxiliares do grupo.
+- **Slides**: Contém as apresentações e slides produzidos sobre o projeto.
 
 
 ## Colaboradores
