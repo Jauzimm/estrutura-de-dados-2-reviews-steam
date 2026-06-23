@@ -486,24 +486,8 @@ body {
   max-height: 160px;
   overflow: hidden;
   position: relative;
-}
-
-.review-text.collapsed::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 100px;
-  background: linear-gradient(
-    to bottom,
-    rgba(42, 71, 94, 0) 0%,
-    rgba(42, 71, 94, 0.15) 30%,
-    rgba(42, 71, 94, 0.45) 60%,
-    rgba(42, 71, 94, 0.75) 85%,
-    rgba(42, 71, 94, 0.95) 100%
-  );
-  pointer-events: none;
+  -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+  mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
 }
 
 .expand-btn {
